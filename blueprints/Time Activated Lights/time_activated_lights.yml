@@ -5,15 +5,14 @@ blueprint:
 
   input:
     time_entity:
-      name: Time
+      name: Time to trigger lights.
       description: Time to trigger lights.
-      default: "06:30:00"
       selector:
         time:
 
     light_target:
-      name: Light
-      description: Lights to turn on when time is correct.
+      name: Light to turn on when time is in.
+      description: Lights to turn on when time is in.
       selector:
         target:
           entity:
@@ -22,10 +21,11 @@ blueprint:
 mode: single
 max_exceeded: silent
 
-
 trigger:
   - platform: time
     at: !input time_entity
+  - platform: homeassistant
+    event: start
 
 action:
   - service: light.turn_on
