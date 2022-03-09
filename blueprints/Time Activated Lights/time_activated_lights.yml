@@ -27,9 +27,9 @@ blueprint:
             domain: light
 
 variables:
-  first_event: '{{ on_time if strptime(on_time,time_fmt).time() < strptime(off_time,time_fmt).time() else off_time }}'
-  second_event: '{{ on_time if strptime(on_time,time_fmt).time() >= strptime(off_time,time_fmt).time() else off_time }}'
   time_format: '%H:%M:%S'
+  first_event: '{{ on_time if strptime(on_time,time_format).time() < strptime(off_time,time_format).time() else off_time }}'
+  second_event: '{{ on_time if strptime(on_time,time_format).time() >= strptime(off_time,time_format).time() else off_time }}'
 
 mode: single
 max_exceeded: silent
@@ -45,7 +45,7 @@ action:
     
     - conditions:
       - condition: template
-        value_template: '{{ now().time() >= strptime(first_event, time_format).time() and now().time() < strptime(second_event, time_format).time() }}'
+        value_template:  '{{ now().time() >= strptime(first_event,time_format).time() and now().time() < strptime(second_event,time_format).time() }}'
     
       sequence:
         - service: 'light.{{ "turn_on" if first_event == on_time else "turn_off" }}'
