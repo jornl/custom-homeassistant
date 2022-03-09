@@ -1,0 +1,31 @@
+blueprint:
+  name: Time Activated Lights
+  description: Turn on lights at a specific time.
+  domain: automation
+
+  input:
+    time_entity:
+      name: Time
+      description: Time to trigger lights.
+      default: "06:30:00"
+      selector:
+        time: {}
+
+    light_target:
+      name: Light
+      description: Lights to turn on when time is correct.
+      selector:
+        target:
+          entity:
+            domain: light
+
+mode: restart
+max_exceeded: silent
+
+trigger:
+  - platform: time
+    entity_id: !input time_entity
+
+action:
+  - service: light.turn_on
+    entity_id: !input light_target
