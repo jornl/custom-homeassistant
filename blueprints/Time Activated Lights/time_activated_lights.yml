@@ -26,7 +26,7 @@ blueprint:
         number:
           min: 5
           max: 100
-          unit_of_measure: '%'
+          unit_of_measure: "%"
 
 mode: single
 max_exceeded: silent
