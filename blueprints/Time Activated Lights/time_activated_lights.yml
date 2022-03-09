@@ -31,4 +31,4 @@ trigger:
 
 action:
   - service: light.turn_on
-    entity_id: !input light_target
+    target: !input light_target
