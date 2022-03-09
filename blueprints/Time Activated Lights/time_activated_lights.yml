@@ -9,7 +9,7 @@ blueprint:
       description: Time to trigger lights.
       default: "06:30:00"
       selector:
-        time: {}
+        time:
 
     light_target:
       name: Light
@@ -19,7 +19,7 @@ blueprint:
           entity:
             domain: light
 
-mode: restart
+mode: single
 max_exceeded: silent
 
 variables:
