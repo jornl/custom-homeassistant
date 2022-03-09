@@ -22,12 +22,10 @@ blueprint:
 mode: single
 max_exceeded: silent
 
-variables:
-  time_on: !input time_entity
 
 trigger:
   - platform: time
-    at: !input time_on
+    at: !input time_entity
 
 action:
   - service: light.turn_on
