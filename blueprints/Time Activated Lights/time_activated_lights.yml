@@ -27,6 +27,8 @@ blueprint:
             domain: light
 
 variables:
+  time_off: !input time_off
+  time_on: !input time_on
   time_format: '%H:%M:%S'
   first_event: '{{ time_on if strptime(time_on,time_format).time() < strptime(time_off,time_format).time() else time_off }}'
   second_event: '{{ time_on if strptime(time_on,time_format).time() >= strptime(time_off,time_format).time() else time_off }}'
