@@ -27,7 +27,7 @@ variables:
 
 trigger:
   - platform: time
-    at: time_on
+    at: !input time_on
 
 action:
   - service: light.turn_on
