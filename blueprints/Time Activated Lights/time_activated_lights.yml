@@ -4,10 +4,17 @@ blueprint:
   domain: automation
 
   input:
-    time_entity:
-      name: Time to trigger lights.
-      description: Time to trigger lights.
+    time_on:
+      name: Time to turn on lights.
+      description: Time to turn on lights.
       default: '10:00:00'
+      selector:
+        time:
+
+    time_off:
+      name: Time to turn off lights.
+      description: Time to turn off lights.
+      default: '23:00:00'
       selector:
         time:
 
@@ -18,27 +25,32 @@ blueprint:
         target:
           entity:
             domain: light
-    
-    light_brightness:
-      name: Specify how bright you want the light to be.
-      description: Specify how bright you want the light to be.
-      selector:
-        number:
-          min: 5
-          max: 100
-          unit_of_measurement: "%"
+
+variables:
+  first_event: '{{ on_time if strptime(on_time,time_fmt).time() < strptime(off_time,time_fmt).time() else off_time }}'
+  second_event: '{{ on_time if strptime(on_time,time_fmt).time() >= strptime(off_time,time_fmt).time() else off_time }}'
 
 mode: single
 max_exceeded: silent
 
 trigger:
   - platform: time
-    at: !input time_entity
-  - platform: homeassistant
-    event: start
+    at: 
+      - !input time_on
+      - !input time_off
 
 action:
-  - service: light.turn_on
-    target: !input light_target
-    data:
-      brightness: !input light_brightness
+  - choose:
+    
+    - conditions:
+      - condition: template
+        value_template: '{{ now().time() >= strptime(first_event, %H:%M:%S).time() and now().time() < strptime(second_event, %H:%M:%S).time() }}'
+    
+      sequence:
+        - service: 'light.{{ "turn_on" if first_event == on_time else "turn_off" }}'
+          target: !input light_target
+    
+    default:
+      - service: 'light.{{ "turn_on" if second_event == on_time else "turn_off" }}'
+        target: !input light_target
+    
