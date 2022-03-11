@@ -1,0 +1,65 @@
+blueprint:
+  name: Philips Hue Dimmer Switch
+  description: A basic 4 button switch.
+  domain: automation
+
+  input:
+    switch:
+      name: Select a dimmer switch
+      description: Pick a dimmer switch
+      selector:
+        device:
+          manufacturer: Philips
+          entity:
+            domain: sensor
+            device_class: battery
+
+    lights:
+      name: Light(s)
+      description: The light(s) to control
+      selector:
+        target:
+          entity:
+            domain: light
+
+mode: restart
+max_exceeded: silent
+
+trigger:
+  - platform: event
+    event_type: deconz_event
+    event_data:
+      device_id: !input switch
+
+action:
+  - variables:
+      event: "{{ trigger.event.data.event }}"
+
+  - choose:
+    - conditions:
+      - condition: "{{ event == 1000 }}"    
+      sequence:
+        - service: light.turn_on
+          target: !input lights
+
+    - conditions:
+      - condition: "{{ event == 4000 }}"
+      sequence:
+        - service: light.turn_off
+          target: !input lights
+
+    - conditions:
+      - condition: "{{ event == 2000 }}"
+      sequence:
+        - service: light.turn_on
+          target: !input lights
+          data:
+            brightness_step_pct: 10
+
+    - conditions:
+      - condition: "{{ event == 3000 }}"
+      sequence:
+        - service: light.turn_on
+          target: !input lights
+          data:
+            brightness_step_pct: -10
