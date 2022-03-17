@@ -1,0 +1,116 @@
+blueprint:
+  name: Advanced Motion Sensor
+  description: A more advanced motion sensor to control entities.
+  domain: automation
+
+  input:
+    motion_sensor:
+      name: Motion Sensor
+      # description: The motion sensor to get the state from
+      selector:
+        entity:
+          domain: binary_sensor
+          device_class: motion
+
+    night_enabled:
+      name: Lower brightness at night
+      description: If enabled the brightness between 23:00 and 06:00 will be set to 15%
+      default: 'on'
+      selector:
+        boolean:
+
+    nighttime_start:
+      name: Time when night starts
+      default: '23:00:00'
+      selector:
+        time:
+
+    nighttime_end:
+      name: Time when night ends
+      default: '06:00:00'
+      selector:
+        time:
+
+    input_boolean:
+      name: Input Boolean
+      description: If selected, will not turn lights off after given seconds.
+      default: 
+      selector:
+        entity:
+          domain: input_boolean
+
+    lights:
+      name: Lights
+      # description: TBD
+      selector:
+        target:
+          entity:
+            domain: light
+
+    no_motion_delay:
+      name: Wait time
+      description: The time in seconds to wait before turning off the lights
+      default: 120
+      selector:
+        number:
+          min: 0
+          max: 3600
+          unit_of_measurement: seconds
+
+mode: restart
+max_exceeded: silent
+
+trigger:
+  - platform: state
+    entity_id: !input motion_sensor
+    from: 'off'
+    to: 'on'
+
+action:
+  - variables:
+      night_enabled: !input night_enabled
+      input_boolean: !input input_boolean
+
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: "{{ night_enabled == 'on' }}"
+      - condition: and
+        conditions:
+          - condition: time
+            after: !input nighttime_start
+            before: !input nighttime_end
+          
+      sequence:
+        - service: light.turn_on
+          target: !input lights
+          data:
+            brightness: 15
+        - wait_for_trigger:
+            platform: state
+            entity_id: !input motion_sensor
+            from: 'on'
+            to: 'off'
+        - delay: !input no_motion_delay
+        - service: light.turn_off
+          target: !input lights
+
+    default:
+      - service: light.turn_on
+        target: !input lights
+        data:
+          brightness: 70
+      - wait_for_trigger:
+          platform: state
+          entity_id: !input motion_sensor
+          from: 'on'
+          to: 'off'
+      - delay: !input no_motion_delay
+      - choose:
+        - conditions:
+          - condition: template
+            value_template: "{{ input_boolean.state == 'on' }}"
+        - sequence:
+          - service: light.turn_off
+            target: !input lights
+
