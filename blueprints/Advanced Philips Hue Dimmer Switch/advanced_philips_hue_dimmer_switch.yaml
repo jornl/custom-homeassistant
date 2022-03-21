@@ -1,0 +1,79 @@
+blueprint:
+  name: Philips Hue Dimmer Switch
+  description: A more advanced dimmer switch
+  domain: automation
+
+  input:
+    remote:
+      name: Remote
+      description: Philips Hue dimmer to use
+      selector:
+        device:
+          integration: deconz
+          manufacturer: Philips
+          model: RWL021
+
+    light:
+      name: Lights
+      description: Lights to control
+      selector:
+        target:
+          entity:
+            domain: light
+    
+    button_1_shortclick:
+      name: Button 1 - short click
+      default: []
+      selector:
+        action: {}
+
+    button_1_longclick:
+      name: Button 1 - long click
+      default: []
+      selector:
+        action: {}
+
+    button_up_shortclick:
+      name: Button up - short click
+      default: []
+      selector:
+          action: {}
+    
+    button_up_longclick:
+      name: Button up - long click
+      default: []
+      selector:
+          action: {}
+
+    button_down_shortclick:
+      name: Button down - short click
+      default: []
+      selector:
+          action: {}
+
+    button_down_longclick:
+      name: Button down - long click
+      default: []
+      selector:
+          action: {}
+
+    button_0_shortclick:
+      name: Button 0 - short click
+      default: []
+      selector:
+          action: {}
+
+    button_0_longclick:
+      name: Button up - long click
+      default: []
+      selector:
+          action: {}
+
+mode: restart
+max_exceeded: silent
+
+trigger:
+  - platform:
+    event_type: deconz_event
+    event_data:
+      device_id: !input remote
